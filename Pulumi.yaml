@@ -1,0 +1,11 @@
+name: email-sender-crewai-agent
+runtime: 
+   name: python ## Installed language runtime of the Project
+   options:
+    toolchain: pip
+    virtualenv: myenv
+description: This contains resources for deploying email-sender-crewai-agent to lambda  ##Objectvie
+backend:
+  url: "s3://devops-pro-187025654051-bucket?region=us-east-2"
+options:
+  refresh: always ##Setting to always so that Pulumi refresh state before Performing Pulumi operation
