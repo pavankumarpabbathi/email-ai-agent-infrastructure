@@ -23,6 +23,4 @@ jobs:
       - uses: pulumi/actions@v6
         with:
           command: up
-          stack-name: ${{ var.stack_name }}
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          stack-name: ${{ vars.stack_name }}
