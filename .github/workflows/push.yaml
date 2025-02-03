@@ -1,11 +1,19 @@
 name: Pulumi
 on:
+  workflow_call:
+    inputs:
+      image_uri:
+         type: string
+         description: ECR Repo container IMAGE URI to use in lambda Function
+         default: ""
+         required: true
   repository_dispatch:
      types: [Deploy]
   workflow_dispatch:
   # push:
   #   branches:
   #     - main
+  
 jobs:
   update:
     name: Update
