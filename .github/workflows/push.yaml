@@ -1,5 +1,7 @@
 name: Pulumi
 on:
+  repository_dispatch:
+     types: [Deploy]
   workflow_dispatch:
   # push:
   #   branches:
