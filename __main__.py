@@ -52,7 +52,7 @@ lambda_fn_args = {
     "architectures": ["x86_64"],
     "description": "Function running the AI Agent",
     "package_type": "Image",
-    "timeout": 15,
+    "timeout": 900,
     "tags": {
       "Environment": "Dev",
       "Owner": "TeamDevOps"
