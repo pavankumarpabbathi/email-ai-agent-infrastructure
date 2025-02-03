@@ -78,7 +78,57 @@ lambda_fn = aws.lambda_.Function("email-sender-lambda",
    opts=pulumi.ResourceOptions(depends_on=[lambda_iam_role])
  )
 
+
+##Code for creating a role which will then be assigned to EventBridge Schedular to Invoke Lambda Function
+eventbridge_schedular_role = {
+    "assume_role_policy": json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": "sts:AssumeRole",
+                "Principal": {
+                    "Service": "schedular.amazonaws.com"
+                }
+            }]
+    }),
+    "description": "Role for EventBridge Schedular",
+    "force_detach_policies": True,
+    "managed_policy_arns": ["arn:aws:iam::aws:policy/AWSLambda_FullAccess"],
+    "name": "email-sender-agent-schedular-role",
+    "tags": {
+        "Environment": "Dev",
+        "Owner": "DevOps"
+    }
+}
+
+eventbridge_schedular_role = aws.iam.Role("eventbridge_schedular_role",
+    **eventbridge_schedular_role
+)
+
+eventbridge_schedular_args = {
+    "name": "email-sender-agent-schedular",
+    "group_name": "default",
+    "flexible_time_window": {
+        "mode": "FLEXIBLE",
+        "maximum_window_in_minutes": 15
+    },
+    "schedule_expression": "0 5 28 * ? *",
+    "target": {
+        "arn": lambda_fn.arn,
+        "role_arn": eventbridge_schedular_role.arn
+    }
+}
+
+##Code for creating EventBridge Schedular
+eventbrige_schedular = aws.schedular.Schedule("eventbridge_schedular"
+   **eventbridge_schedular_args,
+   opts = pulumi.ResourceOptions(depends_on=[eventbridge_schedular_role, lambda_fn]))
+
 # pulumi.export("bucket_name", b.id)
 pulumi.export("role_arn", lambda_iam_role.arn)
 pulumi.export("role_name", lambda_iam_role.id)
 pulumi.export("LambdaARN", lambda_fn.arn)
+pulumi.export("EventBridgeRoleArn", eventbridge_schedular_role.arn)
+pulumi.export("EventBridgeSchedularArn", eventbrige_schedular.arn)
+pulumi.export("EventBridgeSchedularID", eventbrige_schedular.id)
