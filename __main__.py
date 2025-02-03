@@ -6,15 +6,11 @@ import os
 
 
 IMAGE_URI = os.environ['image_uri']
-
-b = aws.s3.Bucket("firstbucket",
-    opts = pulumi.ResourceOptions(retain_on_delete=True),
-    bucket="my-tf-test-187025654051-bucket",
-    force_destroy=True,
-    tags={
-        "Name": "My bucket",
-        "Environment": "Dev",
-    })
+BEDROCK_MODEL_NAME = os.environ['BEDROCK_MODEL_NAME']
+BUCKET_NAME = os.environ['BUCKET_NAME']
+EMAIL_APP_PASSWORD = os.environ['EMAIL_APP_PASSWORD']
+RECIPIENT_EMAIL_ADDRESS = os.environ['RECIPIENT_EMAIL_ADDRESS']
+SENDER_EMAIL_ADDRESS = os.environ['SENDER_EMAIL_ADDRESS']
 
 ##In Pulumi Sequence[str] = List of string
 
@@ -45,8 +41,7 @@ lambda_role_args = {
 }
 
 lambda_iam_role = aws.iam.Role("lambda_role",
-    **lambda_role_args,
-    opts = pulumi.ResourceOptions(depends_on=[b], protect=False)
+    **lambda_role_args
 )
 
 
@@ -64,7 +59,18 @@ lambda_fn_args = {
     },
     "name": "email-sender-ai-agent",
     "memory_size": 1024,
-    "image_uri": IMAGE_URI
+    "image_uri": IMAGE_URI,
+    "environment": {
+        "variables": {
+            "BEDROCK_MODEL_NAME": BEDROCK_MODEL_NAME,
+            "BUCKET_NAME": BUCKET_NAME,
+            "CREWAI_STORAGE_DIR": "/tmp",
+            "EMAIL_APP_PASSWORD": EMAIL_APP_PASSWORD,
+            "RECIPIENT_EMAIL_ADDRESS": RECIPIENT_EMAIL_ADDRESS,
+            "SENDER_EMAIL_ADDRESS": SENDER_EMAIL_ADDRESS
+            
+        }
+    }
 }
 
 lambda_fn = aws.lambda_.Function("email-sender-lambda",
@@ -72,7 +78,7 @@ lambda_fn = aws.lambda_.Function("email-sender-lambda",
    opts=pulumi.ResourceOptions(depends_on=[lambda_iam_role])
  )
 
-pulumi.export("bucket_name", b.id)
+# pulumi.export("bucket_name", b.id)
 pulumi.export("role_arn", lambda_iam_role.arn)
 pulumi.export("role_name", lambda_iam_role.id)
 pulumi.export("LambdaARN", lambda_fn.arn)
