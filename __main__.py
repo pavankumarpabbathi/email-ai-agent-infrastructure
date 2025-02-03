@@ -2,7 +2,10 @@ import pulumi
 import pulumi_aws as aws
 import pulumi_awsx as awsx ##Pulumi for Crosswalk
 import json
+import os 
 
+
+IMAGE_URI = os.environ['image_uri']
 
 b = aws.s3.Bucket("firstbucket",
     opts = pulumi.ResourceOptions(retain_on_delete=True),
@@ -47,18 +50,29 @@ lambda_iam_role = aws.iam.Role("lambda_role",
 )
 
 
-ecr_repo_args = {
-    "force_delete": True,
-    "name": "email-sender-agent-repo",
-    "image_scanning_configuration": {
-        "scan_on_push": True
-    },
+##Pulumi Code to create a lmabda function using container Image
+
+lambda_fn_args = {
+    "role": lambda_iam_role.arn,
+    "architectures": ["x86_64"],
+    "description": "Function running the AI Agent",
+    "package_type": "Image",
+    "timeout": 15,
     "tags": {
-        "Environment": "Dev",
-        "Owner": "DevOps"
-    }
+      "Environment": "Dev",
+      "Owner": "TeamDevOps"
+    },
+    "name": "email-sender-ai-agent",
+    "memory_size": 1024,
+    "image_uri": IMAGE_URI
 }
+
+lambda_fn = aws.lambda_.Function("email-sender-lambda",
+   **lambda_fn_args,
+   opts=pulumi.ResourceOptions(depends_on=[lambda_iam_role])
+ )
 
 pulumi.export("bucket_name", b.id)
 pulumi.export("role_arn", lambda_iam_role.arn)
 pulumi.export("role_name", lambda_iam_role.id)
+pulumi.export("LambdaARN", lambda_fn.arn)
