@@ -121,7 +121,7 @@ eventbridge_scheduler_args = {
 }
 
 ##Code for creating EventBridge scheduler
-eventbrige_scheduler = aws.scheduler.Schedule("eventbridge_scheduler"
+eventbrige_scheduler = aws.scheduler.Schedule("eventbridge_scheduler",
    **eventbridge_scheduler_args,
    opts = pulumi.ResourceOptions(depends_on=[eventbridge_scheduler_role, lambda_fn]))
 
