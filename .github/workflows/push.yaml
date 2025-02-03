@@ -23,6 +23,8 @@ jobs:
       - name: Installing Pulumi CLI
         uses: pulumi/actions@v6
       - name: Create and Select Stack for Pulumi Deployment
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run:
           pulumi stack select ${{ vars.stack_name }} --create --secrets-provider passphrase
       - uses: pulumi/actions@v6
