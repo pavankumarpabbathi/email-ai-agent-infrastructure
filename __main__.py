@@ -113,7 +113,7 @@ eventbridge_scheduler_args = {
         "mode": "FLEXIBLE",
         "maximum_window_in_minutes": 15
     },
-    "schedule_expression": "0 5 28 * ? *",
+    "schedule_expression": "cron(0 5 28 * ? *)",
     "target": {
         "arn": lambda_fn.arn,
         "role_arn": eventbridge_scheduler_role.arn
