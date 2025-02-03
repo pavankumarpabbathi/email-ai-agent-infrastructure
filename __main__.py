@@ -88,7 +88,7 @@ eventbridge_schedular_role = {
                 "Effect": "Allow",
                 "Action": "sts:AssumeRole",
                 "Principal": {
-                    "Service": "schedular.amazonaws.com"
+                    "Service": "scheduler.amazonaws.com"
                 }
             }]
     }),
